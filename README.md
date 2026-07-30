@@ -4,6 +4,8 @@ A tiny Space-Invaders tribute, dedicated to Ruby — you play a "6" shooting dow
 waves of "7"-shaped aliens. Watch for the occasional "9" drifting across the
 top of the screen... because sometimes seven eats nine.
 
+**[▶ Play it](https://benwtr.github.io/67/)**
+
 ## Run it
 
 No build step needed. Either:
@@ -13,6 +15,13 @@ No build step needed. Either:
 
 ## Controls
 
+Desktop:
+
 - **Arrow keys / A-D** — move
 - **Space** — shoot
 - **Enter** — start / restart
+
+Mobile:
+
+- **Tap** — start / restart
+- **Drag** — the 6 follows your finger, and auto-fires while you hold

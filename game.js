@@ -10,6 +10,9 @@
     gameOver: 'Why was six afraid of seven?  Because seven ate nine.'
   };
 
+  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    || 'ontouchstart' in window;
+
   const keys = new Set();
   window.addEventListener('keydown', (e) => {
     keys.add(e.code);
@@ -19,6 +22,44 @@
     if (['ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
   });
   window.addEventListener('keyup', (e) => keys.delete(e.code));
+
+  // Touch: drag anywhere on the canvas to steer the 6, which auto-fires while
+  // held — the same thing holding Space does on a keyboard.
+  const touch = { active: false, x: null };
+
+  // The canvas is scaled by CSS, so client pixels != canvas pixels.
+  function toCanvasX(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    return (clientX - rect.left) * (W / rect.width);
+  }
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (state.mode === 'start' || state.mode === 'gameover') {
+      startGame();
+      return;
+    }
+    touch.active = true;
+    touch.x = toCanvasX(e.touches[0].clientX);
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (!touch.active) return;
+    touch.x = toCanvasX(e.touches[0].clientX);
+  }, { passive: false });
+
+  function endTouch(e) {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      touch.x = toCanvasX(e.touches[0].clientX);
+      return;
+    }
+    touch.active = false;
+    touch.x = null;
+  }
+  canvas.addEventListener('touchend', endTouch, { passive: false });
+  canvas.addEventListener('touchcancel', endTouch, { passive: false });
 
   function makePlayer() {
     return {
@@ -120,11 +161,12 @@
     const p = state.player;
     if (keys.has('ArrowLeft') || keys.has('KeyA')) p.x -= p.speed * dt;
     if (keys.has('ArrowRight') || keys.has('KeyD')) p.x += p.speed * dt;
+    if (touch.active && touch.x !== null) p.x = touch.x;
     p.x = Math.max(p.w / 2 + 4, Math.min(W - p.w / 2 - 4, p.x));
 
     p.cooldown -= dt;
     if (p.invuln > 0) p.invuln -= dt;
-    if (keys.has('Space') && p.cooldown <= 0) {
+    if ((keys.has('Space') || touch.active) && p.cooldown <= 0) {
       state.bullets.push({ x: p.x, y: p.y - 24, vy: -480 });
       p.cooldown = 0.28;
     }
@@ -243,7 +285,7 @@
       ctx.font = '20px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('dedicated to Ruby', W / 2, H / 2 - 10);
-      ctx.fillText('press ENTER to start', W / 2, H / 2 + 30);
+      ctx.fillText(isTouch ? 'TAP to start' : 'press ENTER to start', W / 2, H / 2 + 30);
       return;
     }
 
@@ -258,7 +300,7 @@
       wrapText(JOKES.gameOver, W / 2, H / 2 + 10, 480, 24);
       ctx.font = '18px monospace';
       ctx.fillStyle = '#39ff6a';
-      ctx.fillText('press ENTER to play again', W / 2, H / 2 + 90);
+      ctx.fillText(isTouch ? 'TAP to play again' : 'press ENTER to play again', W / 2, H / 2 + 90);
       return;
     }
 
