@@ -15,6 +15,13 @@ No build step needed. Either:
 
 ## Controls
 
+Desktop:
+
 - **Arrow keys / A-D** — move
 - **Space** — shoot
 - **Enter** — start / restart
+
+Mobile:
+
+- **Tap** — start / restart
+- **Drag** — the 6 follows your finger, and auto-fires while you hold

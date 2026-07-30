@@ -9,6 +9,8 @@ html, body {
   background: #000;
   color: #39ff6a;
   font-family: 'Courier New', Courier, monospace;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 #wrap {
@@ -48,6 +50,72 @@ canvas {
   background: #050805;
   border: 2px solid #39ff6a;
   box-shadow: 0 0 20px rgba(57, 255, 106, 0.4);
-  max-width: 100%;
+  /* Auto width/height with max constraints keeps the 640:720 aspect ratio
+     while fitting whichever axis runs out of room first. */
+  width: auto;
   height: auto;
+  max-width: 100%;
+  /* Leave room for the title and hint, so the board never runs off-screen —
+     but stay at native size on desktop, where there is space to spare. */
+  max-height: calc(100vh - 175px);
+  max-height: calc(100dvh - 175px);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Show the control hint that matches the input device. */
+.hint-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hint-keys {
+    display: none;
+  }
+  .hint-touch {
+    display: block;
+  }
+}
+
+/* Landscape phones: the header eats the whole screen, so trim it back and give
+   the board the height instead. */
+@media (max-height: 500px) {
+  #wrap {
+    padding: 4px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    letter-spacing: 0.2rem;
+  }
+  .subtitle {
+    display: none;
+  }
+  .hint {
+    font-size: 0.7rem;
+    margin-top: 4px;
+  }
+  canvas {
+    max-height: calc(100vh - 62px);
+    max-height: calc(100dvh - 62px);
+  }
+}
+
+@media (max-width: 480px) {
+  #wrap {
+    padding: 8px;
+  }
+  h1 {
+    font-size: 2rem;
+    letter-spacing: 0.25rem;
+  }
+  .subtitle {
+    margin: 2px 0 10px;
+    font-size: 0.85rem;
+  }
+  .hint {
+    font-size: 0.75rem;
+    margin-top: 8px;
+  }
 }
